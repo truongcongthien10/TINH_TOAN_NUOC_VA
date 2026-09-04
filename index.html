@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Toán Áp Lực Nước Va - 2 Trường Hợp</title>
+    <style>
+        :root {
+            --excel-green: #107c41;
+            --section-bg: #e2efda;
+            --border-color: #c8d6c9;
+            --card-bg: #ffffff;
+            --formula-bg: #fdfefe;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f0f4f1; padding: 15px; color: #333; }
+        .container { max-width: 750px; margin: 0 auto; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .header { background: var(--excel-green); color: #fff; text-align: center; padding: 14px; font-weight: bold; font-size: 1.1rem; }
+        .content { padding: 15px; }
+
+        .theory-box { background: var(--formula-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 15px; font-size: 0.88rem; line-height: 1.5; }
+        .theory-title { font-weight: bold; color: var(--excel-green); margin-bottom: 8px; font-size: 0.95rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+        .case-item { margin-bottom: 10px; }
+        .case-title { font-weight: bold; color: #0f5257; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #444; }
+        input, select { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; outline: none; }
+        input:focus { border-color: var(--excel-green); background: #f9fff9; }
+
+        button { grid-column: 1 / -1; margin-top: 10px; padding: 10px; background: var(--excel-green); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
+        button:hover { background: #0e6b37; }
+
+        .result-box { margin-top: 15px; padding: 12px; background: #f8fbf8; border: 1px solid var(--border-color); border-left: 5px solid var(--excel-green); border-radius: 4px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }
+        .result-item strong { color: #107c41; }
+        .warning { color: #d9534f; font-weight: bold; }
+        .safe { color: #2e7d32; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">CƠ SỞ TÍNH TOÁN ÁP LỰC NƯỚC VA TRÊN ĐƯỜNG ỐNG</div>
+    <div class="content">
+
+        <!-- Khung lý thuyết -->
+        <div class="theory-box">
+            <div class="theory-title">Lý thuyết tính toán (2 trường hợp)</div>
+            
+            <div class="case-item">
+                <span class="case-title">• Trường hợp 1: Đóng dòng chảy nhanh / Đột ngột ($T_s \le T_c$)</span>
+                <p>Đây là kịch bản mất điện đột ngột hoặc van chặn bị sập kẹt. Áp lực va tăng thêm đạt mức kích trần (Joukowsky):</p>
+                <p style="text-align: center; margin: 4px 0; font-weight: bold; color: #b00020;">
+                    $$\Delta H_{max} = \frac{a \cdot v_0}{g} \approx \frac{a \cdot v_0}{9.81}$$
+                </p>
+            </div>
+
+            <div class="case-item" style="margin-bottom:0;">
+                <span class="case-title">• Trường hợp 2: Đóng dòng chảy từ từ / Có kiểm soát ($T_s > T_c$)</span>
+                <p>Đây là trường hợp đóng van bướm/van cổng bằng tay hoặc van điện có cài đặt hành trình đóng chậm. Áp lực va được giảm chấn rất nhiều (Michaud):</p>
+                <p style="text-align: center; margin: 4px 0; font-weight: bold; color: #0066cc;">
+                    $$\Delta H_{giam} = \frac{2 \cdot L \cdot v_0}{g \cdot T_s}$$
+                </p>
+            </div>
+        </div>
+
+        <!-- Form nhập liệu -->
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Chiều dài tuyến ống L (m):</label>
+                <input type="number" id="L" value="1000">
+            </div>
+            <div class="form-group">
+                <label>Vận tốc dòng chảy v₀ (m/s):</label>
+                <input type="number" id="v0" step="0.1" value="1.2">
+            </div>
+            <div class="form-group">
+                <label>Vật liệu ống (Vận tốc sóng a):</label>
+                <select id="a">
+                    <option value="350">HDPE (a ≈ 350 m/s)</option>
+                    <option value="400">uPVC (a ≈ 400 m/s)</option>
+                    <option value="1000" selected>Gang dẻo (a ≈ 1000 m/s)</option>
+                    <option value="1200">Thép (a ≈ 1200 m/s)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Thời gian đóng van/ngắt T_s (s):</label>
+                <input type="number" id="Ts" step="0.1" value="1.5" title="Thời gian đóng van hoặc dừng dòng chảy">
+            </div>
+            <div class="form-group">
+                <label>Áp lực làm việc ban đầu H₀ (mH₂O):</label>
+                <input type="number" id="H0" value="40">
+            </div>
+            <div class="form-group">
+                <label>Cấp áp lực ống PN (bar):</label>
+                <input type="number" id="PN" value="10">
+            </div>
+            <button onclick="calculateHammer()">TÍNH TOÁN VÀ ĐÁNH GIÁ</button>
+        </div>
+
+        <!-- Khung kết quả -->
+        <div id="result" class="result-box" style="display:none;"></div>
+
+    </div>
+</div>
+
+<script>
+function calculateHammer() {
+    const g = 9.81;
+    const L = parseFloat(document.getElementById('L').value);
+    const v0 = parseFloat(document.getElementById('v0').value);
+    const a = parseFloat(document.getElementById('a').value);
+    const Ts = parseFloat(document.getElementById('Ts').value);
+    const H0 = parseFloat(document.getElementById('H0').value);
+    const PN = parseFloat(document.getElementById('PN').value);
+
+    // Thời gian sóng truyền phản hồi Tc = 2L / a
+    const Tc = (2 * L) / a;
+
+    let deltaH = 0;
+    let truongHopStr = "";
+    let congThucStr = "";
+
+    if (Ts <= Tc) {
+        truongHopStr = "Trường hợp 1: Đóng nhanh / Đột ngột (T_s ≤ T_c)";
+        congThucStr = "Joukowsky: ΔH = (a × v₀) / g";
+        deltaH = (a * v0) / g;
+    } else {
+        truongHopStr = "Trường hợp 2: Đóng từ từ / Có kiểm soát (T_s > T_c)";
+        congThucStr = "Michaud: ΔH = (2 × L × v₀) / (g × T_s)";
+        deltaH = (2 * L * v0) / (g * Ts);
+    }
+
+    const Hmax = H0 + deltaH;
+    const Pmax_bar = Hmax / 10;
+    const choPhep = PN * 1.2;
+
+    const statusClass = Pmax_bar <= choPhep ? "safe" : "warning";
+    const statusText = Pmax_bar <= choPhep 
+        ? "AN TOÀN (Áp lực đỉnh nằm trong khả năng chịu đựng của ống)" 
+        : "NGUY HIỂM (Vượt quá áp lực cho phép, cần kéo dài thời gian đóng van hoặc giải pháp chống va)";
+
+    const resDiv = document.getElementById('result');
+    resDiv.style.display = 'block';
+    resDiv.innerHTML = `
+        <div class="result-item"><span>Thời gian sóng phản hồi ($T_c = 2L/a$):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
+        <div class="result-item"><span>Phân loại điều kiện:</span> <strong>${truongHopStr}</strong></div>
+        <div class="result-item"><span>Công thức áp dụng:</span> <strong>${congThucStr}</strong></div>
+        <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">
+        <div class="result-item"><span>Độ tăng áp va (${\\Delta}H$):</span> <strong>+${deltaH.toFixed(2)} mH₂O (${(deltaH/10).toFixed(2)} bar)</strong></div>
+        <div class="result-item"><span>Áp lực lớn nhất ($H_{max} = H_0 + {\\Delta}H$):</span> <strong>${Hmax.toFixed(2)} mH₂O (${Pmax_bar.toFixed(2)} bar)</strong></div>
+        <div class="result-item" style="margin-top:8px;"><span>Đánh giá an toàn:</span> <span class="${statusClass}">${statusText}</span></div>
+    `;
+}
+</script>
+
+</body>
+</html>
