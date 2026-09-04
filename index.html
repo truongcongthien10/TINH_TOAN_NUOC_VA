@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính Toán Áp Lực Nước Va - 2 Trường Hợp</title>
+    <title>Tính Toán Áp Lực Nước Va</title>
     <style>
         :root {
             --excel-green: #107c41;
-            --section-bg: #e2efda;
             --border-color: #c8d6c9;
             --card-bg: #ffffff;
             --formula-bg: #fdfefe;
@@ -46,28 +45,26 @@
     <div class="header">CƠ SỞ TÍNH TOÁN ÁP LỰC NƯỚC VA TRÊN ĐƯỜNG ỐNG</div>
     <div class="content">
 
-        <!-- Khung lý thuyết -->
         <div class="theory-box">
             <div class="theory-title">Lý thuyết tính toán (2 trường hợp)</div>
             
             <div class="case-item">
-                <span class="case-title">• Trường hợp 1: Đóng dòng chảy nhanh / Đột ngột ($T_s \le T_c$)</span>
-                <p>Đây là kịch bản mất điện đột ngột hoặc van chặn bị sập kẹt. Áp lực va tăng thêm đạt mức kích trần (Joukowsky):</p>
+                <span class="case-title">• Trường hợp 1: Đóng dòng chảy nhanh / Đột ngột (T<sub>s</sub> ≤ T<sub>c</sub>)</span>
+                <p>Kịch bản mất điện đột ngột hoặc van bị sập kẹt. Áp lực va tăng đạt mức kích trần (Joukowsky):</p>
                 <p style="text-align: center; margin: 4px 0; font-weight: bold; color: #b00020;">
-                    $$\Delta H_{max} = \frac{a \cdot v_0}{g} \approx \frac{a \cdot v_0}{9.81}$$
+                    ΔH<sub>max</sub> = (a × v₀) / g
                 </p>
             </div>
 
             <div class="case-item" style="margin-bottom:0;">
-                <span class="case-title">• Trường hợp 2: Đóng dòng chảy từ từ / Có kiểm soát ($T_s > T_c$)</span>
-                <p>Đây là trường hợp đóng van bướm/van cổng bằng tay hoặc van điện có cài đặt hành trình đóng chậm. Áp lực va được giảm chấn rất nhiều (Michaud):</p>
+                <span class="case-title">• Trường hợp 2: Đóng dòng chảy từ từ / Có kiểm soát (T<sub>s</sub> > T<sub>c</sub>)</span>
+                <p>Đóng van bằng tay hoặc van điện có điều chỉnh hành trình. Áp lực va được giảm chấn (Michaud):</p>
                 <p style="text-align: center; margin: 4px 0; font-weight: bold; color: #0066cc;">
-                    $$\Delta H_{giam} = \frac{2 \cdot L \cdot v_0}{g \cdot T_s}$$
+                    ΔH<sub>giảm</sub> = (2 × L × v₀) / (g × T<sub>s</sub>)
                 </p>
             </div>
         </div>
 
-        <!-- Form nhập liệu -->
         <div class="form-grid">
             <div class="form-group">
                 <label>Chiều dài tuyến ống L (m):</label>
@@ -78,7 +75,7 @@
                 <input type="number" id="v0" step="0.1" value="1.2">
             </div>
             <div class="form-group">
-                <label>Vật liệu ống (Vận tốc sóng a):</label>
+                <label>Vật liệu ống (Sóng truyền a):</label>
                 <select id="a">
                     <option value="350">HDPE (a ≈ 350 m/s)</option>
                     <option value="400">uPVC (a ≈ 400 m/s)</option>
@@ -87,8 +84,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Thời gian đóng van/ngắt T_s (s):</label>
-                <input type="number" id="Ts" step="0.1" value="1.5" title="Thời gian đóng van hoặc dừng dòng chảy">
+                <label>Thời gian đóng van/ngắt T<sub>s</sub> (s):</label>
+                <input type="number" id="Ts" step="0.1" value="1.5">
             </div>
             <div class="form-group">
                 <label>Áp lực làm việc ban đầu H₀ (mH₂O):</label>
@@ -101,7 +98,6 @@
             <button onclick="calculateHammer()">TÍNH TOÁN VÀ ĐÁNH GIÁ</button>
         </div>
 
-        <!-- Khung kết quả -->
         <div id="result" class="result-box" style="display:none;"></div>
 
     </div>
@@ -117,7 +113,6 @@ function calculateHammer() {
     const H0 = parseFloat(document.getElementById('H0').value);
     const PN = parseFloat(document.getElementById('PN').value);
 
-    // Thời gian sóng truyền phản hồi Tc = 2L / a
     const Tc = (2 * L) / a;
 
     let deltaH = 0;
@@ -140,18 +135,18 @@ function calculateHammer() {
 
     const statusClass = Pmax_bar <= choPhep ? "safe" : "warning";
     const statusText = Pmax_bar <= choPhep 
-        ? "AN TOÀN (Áp lực đỉnh nằm trong khả năng chịu đựng của ống)" 
-        : "NGUY HIỂM (Vượt quá áp lực cho phép, cần kéo dài thời gian đóng van hoặc giải pháp chống va)";
+        ? "AN TOÀN (Nằm trong giới hạn chịu đựng cho phép của ống)" 
+        : "NGUY HIỂM (Vượt áp cho phép, cần tăng T_s hoặc lắp giải pháp chống va)";
 
     const resDiv = document.getElementById('result');
     resDiv.style.display = 'block';
     resDiv.innerHTML = `
-        <div class="result-item"><span>Thời gian sóng phản hồi ($T_c = 2L/a$):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
+        <div class="result-item"><span>Thời gian sóng phản hồi (T_c = 2L/a):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
         <div class="result-item"><span>Phân loại điều kiện:</span> <strong>${truongHopStr}</strong></div>
         <div class="result-item"><span>Công thức áp dụng:</span> <strong>${congThucStr}</strong></div>
         <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">
-        <div class="result-item"><span>Độ tăng áp va (${\\Delta}H$):</span> <strong>+${deltaH.toFixed(2)} mH₂O (${(deltaH/10).toFixed(2)} bar)</strong></div>
-        <div class="result-item"><span>Áp lực lớn nhất ($H_{max} = H_0 + {\\Delta}H$):</span> <strong>${Hmax.toFixed(2)} mH₂O (${Pmax_bar.toFixed(2)} bar)</strong></div>
+        <div class="result-item"><span>Độ tăng áp va (ΔH):</span> <strong>+${deltaH.toFixed(2)} mH₂O (${(deltaH/10).toFixed(2)} bar)</strong></div>
+        <div class="result-item"><span>Áp lực đỉnh (H_max = H₀ + ΔH):</span> <strong>${Hmax.toFixed(2)} mH₂O (${Pmax_bar.toFixed(2)} bar)</strong></div>
         <div class="result-item" style="margin-top:8px;"><span>Đánh giá an toàn:</span> <span class="${statusClass}">${statusText}</span></div>
     `;
 }
