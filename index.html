@@ -55,25 +55,25 @@
             <div class="form-group full-width">
                 <label for="materialSelect">Vật liệu & Cấp áp lực đường ống (PN):</label>
                 <select id="materialSelect" onchange="onMaterialChange()">
-                    <optgroup label="Ống HDPE (E = 1.0 GPa)">
+                    <optgroup label="Ống HDPE (E = 1.0 GPa, C = 140)">
                         <option value="hdpe_pn10" selected>HDPE PN10 (SDR17)</option>
                         <option value="hdpe_pn12.5">HDPE PN12.5 (SDR13.6)</option>
                         <option value="hdpe_pn16">HDPE PN16 (SDR11)</option>
                         <option value="hdpe_pn20">HDPE PN20 (SDR9)</option>
                     </optgroup>
-                    <optgroup label="Ống uPVC (E = 3.5 GPa)">
+                    <optgroup label="Ống uPVC (E = 3.5 GPa, C = 140)">
                         <option value="pvc_pn6">uPVC PN6</option>
                         <option value="pvc_pn8">uPVC PN8</option>
                         <option value="pvc_pn10">uPVC PN10</option>
                         <option value="pvc_pn12.5">uPVC PN12.5</option>
                         <option value="pvc_pn16">uPVC PN16</option>
                     </optgroup>
-                    <optgroup label="Ống Gang Dẻo (E = 170 GPa)">
+                    <optgroup label="Ống Gang Dẻo (E = 170 GPa, C = 130)">
                         <option value="ductile_pn10">Gang Dẻo PN10</option>
                         <option value="ductile_pn16">Gang Dẻo PN16</option>
                         <option value="ductile_k9">Gang Dẻo Class K9 (PN25)</option>
                     </optgroup>
-                    <optgroup label="Ống Thép Cấp Nước (E = 200 GPa)">
+                    <optgroup label="Ống Thép Cấp Nước (E = 200 GPa, C = 120)">
                         <option value="steel_std">Thép STD</option>
                         <option value="steel_sch40">Thép SCH40</option>
                     </optgroup>
@@ -91,12 +91,23 @@
             </div>
 
             <div class="form-group full-width">
-                <label for="calcMode">Chế độ / Kịch bản tính toán:</label>
-                <select id="calcMode" onchange="calculateHammer()">
-                    <option value="auto" selected>Tự động xác định theo T_s và T_c</option>
-                    <option value="1">Đóng nhanh / Ngắt đột ngột (Joukowsky)</option>
-                    <option value="2">Đóng từ từ / Có kiểm soát (Michaud)</option>
+                <label for="v0Mode">Phương thức xác định Vận tốc dòng v₀:</label>
+                <select id="v0Mode" onchange="onV0ModeChange()">
+                    <option value="by_Q" selected>Tự động tính từ Lưu lượng Q và Đường kính ID</option>
+                    <option value="manual">Nhập vận tốc v₀ thủ công</option>
                 </select>
+            </div>
+
+            <!-- Khối tính v0 tự động từ Q -->
+            <div class="form-group" id="qInputGroup">
+                <label for="Q_val">Lưu lượng chảy Q (m³/h):</label>
+                <input type="number" id="Q_val" value="40" step="0.5" onchange="calculateHammer()">
+            </div>
+
+            <!-- Khối nhập v0 thủ công -->
+            <div class="form-group" id="v0ManualGroup" style="display:none;">
+                <label for="v0">Vận tốc ban đầu v₀ nhập tay (m/s):</label>
+                <input type="number" id="v0" step="0.1" value="1.2" onchange="calculateHammer()">
             </div>
 
             <div class="form-group">
@@ -105,8 +116,12 @@
             </div>
 
             <div class="form-group">
-                <label for="v0">Vận tốc dòng ban đầu v₀ (m/s):</label>
-                <input type="number" id="v0" step="0.1" value="1.2" onchange="calculateHammer()">
+                <label for="calcMode">Kịch bản tính toán nước va:</label>
+                <select id="calcMode" onchange="calculateHammer()">
+                    <option value="auto" selected>Tự động xác định theo T_s và T_c</option>
+                    <option value="1">Đóng nhanh / Ngắt đột ngột (Joukowsky)</option>
+                    <option value="2">Đóng từ từ / Có kiểm soát (Michaud)</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -139,10 +154,9 @@
 </div>
 
 <script>
-    // Bảng dữ liệu ống đồng bộ từ chương trình Thông rửa
     const PIPE_DB = {
         hdpe: {
-            ep: 1.0e9,
+            ep: 1.0e9, c: 140,
             dns: [25, 32, 40, 50, 63, 75, 90, 110, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500, 630],
             pns: {
                 "pn10":   [22.0, 28.2, 35.2, 44.0, 55.4, 66.0, 79.2, 96.8, 141.0, 176.2, 198.2, 220.4, 246.8, 277.6, 312.8, 352.6, 396.6, 440.6, 555.2],
@@ -152,7 +166,7 @@
             }
         },
         pvc: {
-            ep: 3.5e9,
+            ep: 3.5e9, c: 140,
             dns: [21, 27, 34, 42, 48, 60, 75, 90, 110, 125, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450],
             pns: {
                 "pn6":    [null, null, null, null, null, 57.0, 71.2, 85.6, 104.6, 118.8, 133.0, 152.2, 171.2, 190.2, 214.0, 237.6, 266.2, 299.6, 337.6, 380.4, 428.0],
@@ -163,7 +177,7 @@
             }
         },
         ductile: {
-            ep: 170e9,
+            ep: 170e9, c: 130,
             dns: [80, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1200],
             pns: {
                 "pn10": [78.6, 100.6, 152.6, 204.6, 256.0, 307.4, 407.0, 508.4, 610.0, 711.4, 812.0, 912.4, 1015.0, 1218.0],
@@ -172,7 +186,7 @@
             }
         },
         steel: {
-            ep: 200e9,
+            ep: 200e9, c: 120,
             dns: [50, 80, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200],
             pns: {
                 "std":   [52.48, 77.92, 102.26, 154.08, 202.74, 254.46, 304.76, 387.36, 488.96, 590.94, 692.14, 793.74, 895.34, 996.94, 1098.54, 1200.14],
@@ -192,6 +206,13 @@
         return match ? parseFloat(match[0]) : 0;
     }
 
+    function onV0ModeChange() {
+        const v0Mode = document.getElementById('v0Mode').value;
+        document.getElementById('qInputGroup').style.display = (v0Mode === 'by_Q') ? 'flex' : 'none';
+        document.getElementById('v0ManualGroup').style.display = (v0Mode === 'manual') ? 'flex' : 'none';
+        calculateHammer();
+    }
+
     function onMaterialChange() {
         const selectedVal = document.getElementById('materialSelect').value;
         const [matGroup, pnSub] = selectedVal.split('_');
@@ -199,13 +220,12 @@
         const matData = PIPE_DB[matGroup];
         currentEp = matData.ep;
 
-        // Trích xuất PN thực tế làm mốc so sánh
         if (pnSub.includes('pn')) {
             currentPNVal = parseFloat(pnSub.replace('pn', ''));
         } else if (pnSub === 'k9') {
             currentPNVal = 25;
         } else {
-            currentPNVal = 16; // Thép mặc định
+            currentPNVal = 16;
         }
 
         const dnSelect = document.getElementById('dnSelect');
@@ -247,7 +267,6 @@
             const idVal = PIPE_DB[matGroup].pns[pnSub][dnIndex];
             
             currentDi = parseFloat(idVal) || 0;
-            // Tính độ dày e = (DN - Di)/2
             currentThickness = (numericDN > currentDi) ? (numericDN - currentDi) / 2 : 5.0;
 
             document.getElementById('pipeDetailDisplay').innerText = `ID: ${currentDi} mm | Thickness (e): ${currentThickness.toFixed(2)} mm`;
@@ -262,25 +281,42 @@
 
     function calculateHammer() {
         const g = 9.81;
-        const Ew = 2.19e9; // Mô đun đàn hồi thể tích nước (Pa)
+        const Ew = 2.19e9;
         
+        const v0Mode = document.getElementById('v0Mode').value;
         const mode = document.getElementById('calcMode').value;
         const L = parseFloat(document.getElementById('L').value) || 0;
-        const v0 = parseFloat(document.getElementById('v0').value) || 0;
         const Ts = parseFloat(document.getElementById('Ts').value) || 0;
         const H0 = parseFloat(document.getElementById('H0').value) || 0;
         const sf = parseFloat(document.getElementById('safetyFactor').value);
 
-        if (currentDi <= 0 || currentThickness <= 0 || L <= 0 || v0 <= 0) {
+        if (currentDi <= 0 || currentThickness <= 0 || L <= 0) {
             document.getElementById('result').style.display = 'none';
             return;
         }
 
-        // 1. Tự động tính vận tốc sóng âm a (m/s)
+        // 1. Xác định vận tốc v0
+        let v0 = 0;
+        if (v0Mode === 'by_Q') {
+            const Q_m3h = parseFloat(document.getElementById('Q_val').value) || 0;
+            const Q_m3s = Q_m3h / 3600;
+            const D_m = currentDi / 1000;
+            const A = (Math.PI * Math.pow(D_m, 2)) / 4;
+            v0 = Q_m3s / A;
+        } else {
+            v0 = parseFloat(document.getElementById('v0').value) || 0;
+        }
+
+        if (v0 <= 0) {
+            document.getElementById('result').style.display = 'none';
+            return;
+        }
+
+        // 2. Tính vận tốc sóng âm a
         const diERatio = currentDi / currentThickness;
         const a = 1435 / Math.sqrt(1 + (Ew / currentEp) * diERatio);
 
-        // 2. Tính chu kỳ sóng T_c
+        // 3. Tính chu kỳ sóng T_c
         const Tc = (2 * L) / a;
 
         let deltaH = 0;
@@ -311,6 +347,7 @@
         const resDiv = document.getElementById('result');
         resDiv.style.display = 'block';
         resDiv.innerHTML = `
+            <div class="result-item"><span>Vận tốc dòng chảy tính toán (v₀):</span> <strong>${v0.toFixed(2)} m/s</strong></div>
             <div class="result-item"><span>Tỷ lệ D_i / e:</span> <strong>${diERatio.toFixed(2)}</strong></div>
             <div class="result-item"><span>Vận tốc truyền sóng áp lực (a):</span> <strong>${a.toFixed(1)} m/s</strong></div>
             <div class="result-item"><span>Thời gian sóng phản hồi (T_c = 2L/a):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
@@ -324,6 +361,7 @@
     }
 
     window.onload = function() {
+        onV0ModeChange();
         onMaterialChange();
     };
 </script>
