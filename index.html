@@ -32,6 +32,33 @@
         input, select { padding: 7px 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; outline: none; background: #fff; height: 35px; }
         input:focus, select:focus { background-color: var(--focus-yellow-bg); border-color: var(--focus-yellow-border); }
 
+        /* KHỐI NỔI BẬT ĐẶC BIỆT CHO PHƯƠNG THỨC XÁC ĐỊNH V0 */
+        .highlight-v0-box {
+            background-color: #fff9e6;
+            border: 2px solid #d97706;
+            border-radius: 6px;
+            padding: 10px 12px;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.15);
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+        .highlight-v0-box label {
+            color: #b45309;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+        .highlight-v0-box select {
+            border: 1.5px solid #d97706;
+            background-color: #ffffff;
+            font-weight: 700;
+            color: #92400e;
+        }
+        .highlight-v0-box select:focus {
+            background-color: #fffde6;
+            border-color: #b45309;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
+        }
+
         .pipe-info-badge {
             font-size: 0.78rem; color: #107c41; font-weight: 700; margin-top: 3px; background-color: #f0f7f0; padding: 3px 8px; border-radius: 3px; border: 1px dashed #b2d8b4;
         }
@@ -69,8 +96,9 @@
                 <div class="pipe-info-badge" id="pipeDetailDisplay">ID: - mm | e: - mm</div>
             </div>
 
-            <div class="form-group full-width">
-                <label for="v0Mode">Phương thức xác định Vận tốc dòng v₀:</label>
+            <!-- Ô ĐƯỢC NHẤN MẠNH MỎNG NỔI BẬT -->
+            <div class="form-group full-width highlight-v0-box">
+                <label for="v0Mode">⚡ PHƯƠNG THỨC XÁC ĐỊNH VẬN TỐC DÒNG v₀ (CỰC KỲ QUAN TRỌNG):</label>
                 <select id="v0Mode" onchange="onV0ModeChange()">
                     <option value="by_Q" selected>Tự động tính từ Lưu lượng Q và Đường kính ID</option>
                     <option value="manual">Nhập vận tốc v₀ thủ công</option>
