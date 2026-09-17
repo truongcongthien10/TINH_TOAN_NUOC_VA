@@ -3,25 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính Toán Áp Lực Nước Va</title>
+    <title>Tính Toán Áp LỰc Nước Va Nâng Cao</title>
     <style>
-        :root {
-            --excel-green: #107c41;
-            --border-color: #c8d6c9;
-            --card-bg: #ffffff;
-            --formula-bg: #fdfefe;
-        }
+        :root { --excel-green: #107c41; --border-color: #c8d6c9; --card-bg: #ffffff; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f0f4f1; padding: 15px; color: #333; }
         .container { max-width: 750px; margin: 0 auto; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .header { background: var(--excel-green); color: #fff; text-align: center; padding: 14px; font-weight: bold; font-size: 1.1rem; }
         .content { padding: 15px; }
-
-        .theory-box { background: var(--formula-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 15px; font-size: 0.88rem; line-height: 1.5; }
-        .theory-title { font-weight: bold; color: var(--excel-green); margin-bottom: 8px; font-size: 0.95rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
-        .case-item { margin-bottom: 10px; }
-        .case-title { font-weight: bold; color: #0f5257; }
-
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
         .form-group { display: flex; flex-direction: column; }
@@ -29,10 +18,8 @@
         label { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #444; }
         input, select { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; outline: none; background: #fff; }
         input:focus, select:focus { border-color: var(--excel-green); background: #f9fff9; }
-
         button { grid-column: 1 / -1; margin-top: 10px; padding: 10px; background: var(--excel-green); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
         button:hover { background: #0e6b37; }
-
         .result-box { margin-top: 15px; padding: 12px; background: #f8fbf8; border: 1px solid var(--border-color); border-left: 5px solid var(--excel-green); border-radius: 4px; }
         .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }
         .result-item strong { color: #107c41; }
@@ -43,37 +30,16 @@
 <body>
 
 <div class="container">
-    <div class="header">CƠ SỞ TÍNH TOÁN ÁP LỰC NƯỚC VA TRÊN ĐƯỜNG ỐNG</div>
+    <div class="header">TÍNH TOÁN VÀ ĐÁNH GIÁ NƯỚC VA CHUYÊN SÂU</div>
     <div class="content">
 
-        <div class="theory-box">
-            <div class="theory-title">Lý thuyết tính toán (2 trường hợp)</div>
-            
-            <div class="case-item">
-                <span class="case-title">• Trường hợp 1: Đóng dòng chảy nhanh / Đột ngột (T<sub>s</sub> ≤ T<sub>c</sub>)</span>
-                <p>Kịch bản mất điện đột ngột hoặc van bị sập kẹt. Áp lực va tăng đạt mức kích trần (Joukowsky):</p>
-                <p style="text-align: center; margin: 4px 0; font-weight: bold; color: #b00020;">
-                    ΔH<sub>max</sub> = (a × v₀) / g
-                </p>
-            </div>
-
-            <div class="case-item" style="margin-bottom:0;">
-                <span class="case-title">• Trường hợp 2: Đóng dòng chảy từ từ / Có kiểm soát (T<sub>s</sub> > T<sub>c</sub>)</span>
-                <p>Đóng van bằng tay hoặc van điện có điều chỉnh hành trình. Áp lực va được giảm chấn (Michaud):</p>
-                <p style="text-align: center; margin: 4px 0; font-weight: bold; color: #0066cc;">
-                    ΔH<sub>giảm</sub> = (2 × L × v₀) / (g × T<sub>s</sub>)
-                </p>
-            </div>
-        </div>
-
         <div class="form-grid">
-            <!-- Danh sách lựa chọn trường hợp -->
             <div class="form-group full-width">
-                <label>Chọn chế độ / Trường hợp tính toán:</label>
+                <label>Chế độ tính toán:</label>
                 <select id="calcMode">
-                    <option value="auto" selected>Tự động phân loại theo T_s và T_c</option>
-                    <option value="1">Trường hợp 1: Đóng nhanh / Đột ngột (Joukowsky)</option>
-                    <option value="2">Trường hợp 2: Đóng từ từ / Có kiểm soát (Michaud)</option>
+                    <option value="auto" selected>Tự động xác định theo T_s và T_c</option>
+                    <option value="1">Đóng nhanh (Joukowsky: T_s ≤ T_c)</option>
+                    <option value="2">Đóng từ từ (Michaud: T_s > T_c)</option>
                 </select>
             </div>
 
@@ -82,31 +48,52 @@
                 <input type="number" id="L" value="1000">
             </div>
             <div class="form-group">
-                <label>Vận tốc dòng chảy v₀ (m/s):</label>
+                <label>Vận tốc ban đầu v₀ (m/s):</label>
                 <input type="number" id="v0" step="0.1" value="1.2">
             </div>
+
             <div class="form-group">
-                <label>Vật liệu ống (Sóng truyền a):</label>
-                <select id="a">
-                    <option value="350">HDPE (a ≈ 350 m/s)</option>
-                    <option value="400">uPVC (a ≈ 400 m/s)</option>
-                    <option value="1000" selected>Gang dẻo (a ≈ 1000 m/s)</option>
-                    <option value="1200">Thép (a ≈ 1200 m/s)</option>
+                <label>Vật liệu ống:</label>
+                <select id="mat" onchange="toggleCustomWaveSpeed()">
+                    <option value="hdpe">HDPE (E = 1.0 GPa)</option>
+                    <option value="pvc">uPVC (E = 3.5 GPa)</option>
+                    <option value="ductile" selected>Gang Dẻo (E = 170 GPa)</option>
+                    <option value="steel">Thép (E = 200 GPa)</option>
+                    <option value="custom">Nhập vận tốc sóng a thủ công</option>
                 </select>
             </div>
+            
+            <div class="form-group" id="waveSpeedGroup" style="display:none;">
+                <label>Vận tốc sóng a nhập tay (m/s):</label>
+                <input type="number" id="customA" value="1000">
+            </div>
+
+            <div class="form-group" id="sdrGroup">
+                <label>Tỷ lệ D_i / e (Đường kính / Độ dày):</label>
+                <input type="number" id="dieRatio" value="15" step="0.5">
+            </div>
+
             <div class="form-group">
-                <label>Thời gian đóng van/ngắt T<sub>s</sub> (s):</label>
+                <label>Thời gian đóng van T<sub>s</sub> (s):</label>
                 <input type="number" id="Ts" step="0.1" value="1.5">
             </div>
             <div class="form-group">
-                <label>Áp lực làm việc ban đầu H₀ (mH₂O):</label>
+                <label>Áp lực tĩnh ban đầu H₀ (mH₂O):</label>
                 <input type="number" id="H0" value="40">
             </div>
             <div class="form-group">
                 <label>Cấp áp lực ống PN (bar):</label>
                 <input type="number" id="PN" value="10">
             </div>
-            <button onclick="calculateHammer()">TÍNH TOÁN VÀ ĐÁNH GIÁ</button>
+            <div class="form-group">
+                <label>Hệ số an toàn chịu áp ngắn hạn:</label>
+                <select id="safetyFactor">
+                    <option value="1.2">1.2 (An toàn tiêu chuẩn)</option>
+                    <option value="1.5" selected>1.5 (Tối đa cho phép ngắn hạn)</option>
+                </select>
+            </div>
+
+            <button onclick="calculateHammer()">TÍNH TOÁN NƯỚC VA</button>
         </div>
 
         <div id="result" class="result-box" style="display:none;"></div>
@@ -115,15 +102,38 @@
 </div>
 
 <script>
+function toggleCustomWaveSpeed() {
+    const mat = document.getElementById('mat').value;
+    document.getElementById('waveSpeedGroup').style.display = (mat === 'custom') ? 'flex' : 'none';
+    document.getElementById('sdrGroup').style.display = (mat === 'custom') ? 'none' : 'flex';
+}
+
 function calculateHammer() {
     const g = 9.81;
     const mode = document.getElementById('calcMode').value;
     const L = parseFloat(document.getElementById('L').value);
     const v0 = parseFloat(document.getElementById('v0').value);
-    const a = parseFloat(document.getElementById('a').value);
     const Ts = parseFloat(document.getElementById('Ts').value);
     const H0 = parseFloat(document.getElementById('H0').value);
     const PN = parseFloat(document.getElementById('PN').value);
+    const sf = parseFloat(document.getElementById('safetyFactor').value);
+    
+    let a = 1000;
+    const mat = document.getElementById('mat').value;
+
+    if (mat === 'custom') {
+        a = parseFloat(document.getElementById('customA').value) || 1000;
+    } else {
+        const dieRatio = parseFloat(document.getElementById('dieRatio').value) || 15;
+        let Ep = 170e9; // N/m2
+        if (mat === 'hdpe') Ep = 1.0e9;
+        if (mat === 'pvc') Ep = 3.5e9;
+        if (mat === 'ductile') Ep = 170e9;
+        if (mat === 'steel') Ep = 200e9;
+
+        const Ew = 2.19e9;
+        a = 1435 / Math.sqrt(1 + (Ew / Ep) * dieRatio);
+    }
 
     const Tc = (2 * L) / a;
 
@@ -131,41 +141,34 @@ function calculateHammer() {
     let truongHopStr = "";
     let congThucStr = "";
 
-    // Xử lý theo tùy chọn từ List
-    let useCase1 = false;
-    if (mode === "auto") {
-        useCase1 = (Ts <= Tc);
-    } else if (mode === "1") {
-        useCase1 = true;
-    } else {
-        useCase1 = false;
-    }
+    let useCase1 = (mode === "auto") ? (Ts <= Tc) : (mode === "1");
 
     if (useCase1) {
-        truongHopStr = "Trường hợp 1: Đóng nhanh / Đột ngột (T_s ≤ T_c)";
+        truongHopStr = `Đóng nhanh / Đột ngột (T_s = ${Ts}s ≤ T_c = ${Tc.toFixed(2)}s)`;
         congThucStr = "Joukowsky: ΔH = (a × v₀) / g";
         deltaH = (a * v0) / g;
     } else {
-        truongHopStr = "Trường hợp 2: Đóng từ từ / Có kiểm soát (T_s > T_c)";
+        truongHopStr = `Đóng từ từ (T_s = ${Ts}s > T_c = ${Tc.toFixed(2)}s)`;
         congThucStr = "Michaud: ΔH = (2 × L × v₀) / (g × T_s)";
         deltaH = (2 * L * v0) / (g * Ts);
     }
 
     const Hmax = H0 + deltaH;
     const Pmax_bar = Hmax / 10;
-    const choPhep = PN * 1.2;
+    const choPhep = PN * sf;
 
     const statusClass = Pmax_bar <= choPhep ? "safe" : "warning";
     const statusText = Pmax_bar <= choPhep 
-        ? "AN TOÀN (Nằm trong giới hạn chịu đựng cho phép của ống)" 
-        : "NGUY HIỂM (Vượt áp cho phép, cần tăng T_s hoặc lắp giải pháp chống va)";
+        ? `AN TOÀN (P_max ≤ ${choPhep.toFixed(1)} bar)` 
+        : `NGUY HIỂM (P_max vượt ngưỡng chịu đựng ${choPhep.toFixed(1)} bar)`;
 
     const resDiv = document.getElementById('result');
     resDiv.style.display = 'block';
     resDiv.innerHTML = `
+        <div class="result-item"><span>Vận tốc truyền sóng áp lực (a):</span> <strong>${a.toFixed(1)} m/s</strong></div>
         <div class="result-item"><span>Thời gian sóng phản hồi (T_c = 2L/a):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
-        <div class="result-item"><span>Phân loại điều kiện:</span> <strong>${truongHopStr}</strong></div>
-        <div class="result-item"><span>Công thức áp dụng:</span> <strong>${congThucStr}</strong></div>
+        <div class="result-item"><span>Điều kiện áp dụng:</span> <strong>${truongHopStr}</strong></div>
+        <div class="result-item"><span>Công thức:</span> <strong>${congThucStr}</strong></div>
         <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">
         <div class="result-item"><span>Độ tăng áp va (ΔH):</span> <strong>+${deltaH.toFixed(2)} mH₂O (${(deltaH/10).toFixed(2)} bar)</strong></div>
         <div class="result-item"><span>Áp lực đỉnh (H_max = H₀ + ΔH):</span> <strong>${Hmax.toFixed(2)} mH₂O (${Pmax_bar.toFixed(2)} bar)</strong></div>
