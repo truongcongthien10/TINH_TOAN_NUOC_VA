@@ -3,178 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính Toán Áp LỰc Nước Va Nâng Cao</title>
+    <title>Tính Toán Áp Lực Nước Va Đồng Bộ - HueWACO</title>
     <style>
-        :root { --excel-green: #107c41; --border-color: #c8d6c9; --card-bg: #ffffff; }
+        :root {
+            --excel-green: #107c41;
+            --section-title: #0f5257;
+            --section-bg: #e2efda;
+            --border-color: #c8d6c9;
+            --card-bg: #ffffff;
+            --focus-yellow-bg: #fffde6;
+            --focus-yellow-border: #e6b800;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f0f4f1; padding: 15px; color: #333; }
         .container { max-width: 750px; margin: 0 auto; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .header { background: var(--excel-green); color: #fff; text-align: center; padding: 14px; font-weight: bold; font-size: 1.1rem; }
+        .header { background: var(--excel-green); color: #fff; text-align: center; padding: 14px; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; }
         .content { padding: 15px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
         @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
         .form-group { display: flex; flex-direction: column; }
         .full-width { grid-column: 1 / -1; }
-        label { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #444; }
-        input, select { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; outline: none; background: #fff; }
-        input:focus, select:focus { border-color: var(--excel-green); background: #f9fff9; }
-        button { grid-column: 1 / -1; margin-top: 10px; padding: 10px; background: var(--excel-green); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
+        label { font-size: 0.83rem; font-weight: 600; margin-bottom: 3px; color: #444; }
+        input, select { padding: 7px 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; outline: none; background: #fff; height: 35px; }
+        input:focus, select:focus { background-color: var(--focus-yellow-bg); border-color: var(--focus-yellow-border); }
+
+        .pipe-info-badge {
+            font-size: 0.78rem; color: #107c41; font-weight: 700; margin-top: 3px; background-color: #f0f7f0; padding: 3px 8px; border-radius: 3px; border: 1px dashed #b2d8b4;
+        }
+
+        button { grid-column: 1 / -1; margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #107c41 0%, #0b592e 100%); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         button:hover { background: #0e6b37; }
-        .result-box { margin-top: 15px; padding: 12px; background: #f8fbf8; border: 1px solid var(--border-color); border-left: 5px solid var(--excel-green); border-radius: 4px; }
-        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }
+
+        .result-box { margin-top: 15px; padding: 12px 15px; background: #f8fbf8; border: 1px solid var(--border-color); border-left: 5px solid var(--excel-green); border-radius: 4px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.88rem; border-bottom: 1px dashed #e0e8e0; padding-bottom: 4px; }
+        .result-item:last-child { border-bottom: none; }
         .result-item strong { color: #107c41; }
         .warning { color: #d9534f; font-weight: bold; }
         .safe { color: #2e7d32; font-weight: bold; }
+        
+        .footer-copyright { padding: 10px 15px; font-size: 0.72rem; color: #666; font-weight: 600; border-top: 1px solid var(--border-color); background: #f9fbf9; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">TÍNH TOÁN VÀ ĐÁNH GIÁ NƯỚC VA CHUYÊN SÂU</div>
+    <div class="header">TÍNH TOÁN ÁP LỰC NƯỚC VA ĐỒNG BỘ - HueWACO</div>
     <div class="content">
 
         <div class="form-grid">
             <div class="form-group full-width">
-                <label>Chế độ tính toán:</label>
-                <select id="calcMode">
+                <label for="materialSelect">Vật liệu & Cấp áp lực đường ống (PN):</label>
+                <select id="materialSelect" onchange="onMaterialChange()">
+                    <optgroup label="Ống HDPE (E = 1.0 GPa)">
+                        <option value="hdpe_pn10" selected>HDPE PN10 (SDR17)</option>
+                        <option value="hdpe_pn12.5">HDPE PN12.5 (SDR13.6)</option>
+                        <option value="hdpe_pn16">HDPE PN16 (SDR11)</option>
+                        <option value="hdpe_pn20">HDPE PN20 (SDR9)</option>
+                    </optgroup>
+                    <optgroup label="Ống uPVC (E = 3.5 GPa)">
+                        <option value="pvc_pn6">uPVC PN6</option>
+                        <option value="pvc_pn8">uPVC PN8</option>
+                        <option value="pvc_pn10">uPVC PN10</option>
+                        <option value="pvc_pn12.5">uPVC PN12.5</option>
+                        <option value="pvc_pn16">uPVC PN16</option>
+                    </optgroup>
+                    <optgroup label="Ống Gang Dẻo (E = 170 GPa)">
+                        <option value="ductile_pn10">Gang Dẻo PN10</option>
+                        <option value="ductile_pn16">Gang Dẻo PN16</option>
+                        <option value="ductile_k9">Gang Dẻo Class K9 (PN25)</option>
+                    </optgroup>
+                    <optgroup label="Ống Thép Cấp Nước (E = 200 GPa)">
+                        <option value="steel_std">Thép STD</option>
+                        <option value="steel_sch40">Thép SCH40</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dnSelect">Đường kính ống (DN):</label>
+                <select id="dnSelect" onchange="onDNChange()"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Thông số vật lý ống:</label>
+                <div class="pipe-info-badge" id="pipeDetailDisplay">ID: - mm | e: - mm</div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="calcMode">Chế độ / Kịch bản tính toán:</label>
+                <select id="calcMode" onchange="calculateHammer()">
                     <option value="auto" selected>Tự động xác định theo T_s và T_c</option>
-                    <option value="1">Đóng nhanh (Joukowsky: T_s ≤ T_c)</option>
-                    <option value="2">Đóng từ từ (Michaud: T_s > T_c)</option>
+                    <option value="1">Đóng nhanh / Ngắt đột ngột (Joukowsky)</option>
+                    <option value="2">Đóng từ từ / Có kiểm soát (Michaud)</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Chiều dài tuyến ống L (m):</label>
-                <input type="number" id="L" value="1000">
-            </div>
-            <div class="form-group">
-                <label>Vận tốc ban đầu v₀ (m/s):</label>
-                <input type="number" id="v0" step="0.1" value="1.2">
+                <label for="L">Chiều dài tuyến ống L (m):</label>
+                <input type="number" id="L" value="500" onchange="calculateHammer()">
             </div>
 
             <div class="form-group">
-                <label>Vật liệu ống:</label>
-                <select id="mat" onchange="toggleCustomWaveSpeed()">
-                    <option value="hdpe">HDPE (E = 1.0 GPa)</option>
-                    <option value="pvc">uPVC (E = 3.5 GPa)</option>
-                    <option value="ductile" selected>Gang Dẻo (E = 170 GPa)</option>
-                    <option value="steel">Thép (E = 200 GPa)</option>
-                    <option value="custom">Nhập vận tốc sóng a thủ công</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="waveSpeedGroup" style="display:none;">
-                <label>Vận tốc sóng a nhập tay (m/s):</label>
-                <input type="number" id="customA" value="1000">
-            </div>
-
-            <div class="form-group" id="sdrGroup">
-                <label>Tỷ lệ D_i / e (Đường kính / Độ dày):</label>
-                <input type="number" id="dieRatio" value="15" step="0.5">
+                <label for="v0">Vận tốc dòng ban đầu v₀ (m/s):</label>
+                <input type="number" id="v0" step="0.1" value="1.2" onchange="calculateHammer()">
             </div>
 
             <div class="form-group">
-                <label>Thời gian đóng van T<sub>s</sub> (s):</label>
-                <input type="number" id="Ts" step="0.1" value="1.5">
+                <label for="Ts">Thời gian đóng van T<sub>s</sub> (s):</label>
+                <input type="number" id="Ts" step="0.1" value="1.5" onchange="calculateHammer()">
             </div>
+
             <div class="form-group">
-                <label>Áp lực tĩnh ban đầu H₀ (mH₂O):</label>
-                <input type="number" id="H0" value="40">
+                <label for="H0">Áp lực tĩnh ban đầu H₀ (mH₂O):</label>
+                <input type="number" id="H0" value="30" onchange="calculateHammer()">
             </div>
-            <div class="form-group">
-                <label>Cấp áp lực ống PN (bar):</label>
-                <input type="number" id="PN" value="10">
-            </div>
-            <div class="form-group">
-                <label>Hệ số an toàn chịu áp ngắn hạn:</label>
-                <select id="safetyFactor">
-                    <option value="1.2">1.2 (An toàn tiêu chuẩn)</option>
-                    <option value="1.5" selected>1.5 (Tối đa cho phép ngắn hạn)</option>
+
+            <div class="form-group full-width">
+                <label for="safetyFactor">Hệ số chịu áp ngắn hạn cho phép:</label>
+                <select id="safetyFactor" onchange="calculateHammer()">
+                    <option value="1.2">1.2 × PN (Giới hạn làm việc an toàn)</option>
+                    <option value="1.5" selected>1.5 × PN (Áp lực thử tĩnh / Va đập ngắn hạn)</option>
                 </select>
             </div>
 
-            <button onclick="calculateHammer()">TÍNH TOÁN NƯỚC VA</button>
+            <button onclick="calculateHammer()">TÍNH TOÁN VÀ ĐÁNH GIÁ NƯỚC VA</button>
         </div>
 
         <div id="result" class="result-box" style="display:none;"></div>
 
     </div>
+    <div class="footer-copyright">
+        Copyright © PHÒNG KỸ THUẬT - HueWACO
+    </div>
 </div>
 
 <script>
-function toggleCustomWaveSpeed() {
-    const mat = document.getElementById('mat').value;
-    document.getElementById('waveSpeedGroup').style.display = (mat === 'custom') ? 'flex' : 'none';
-    document.getElementById('sdrGroup').style.display = (mat === 'custom') ? 'none' : 'flex';
-}
+    // Bảng dữ liệu ống đồng bộ từ chương trình Thông rửa
+    const PIPE_DB = {
+        hdpe: {
+            ep: 1.0e9,
+            dns: [25, 32, 40, 50, 63, 75, 90, 110, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500, 630],
+            pns: {
+                "pn10":   [22.0, 28.2, 35.2, 44.0, 55.4, 66.0, 79.2, 96.8, 141.0, 176.2, 198.2, 220.4, 246.8, 277.6, 312.8, 352.6, 396.6, 440.6, 555.2],
+                "pn12.5": [21.2, 27.2, 34.0, 42.6, 53.6, 63.8, 76.6, 93.8, 136.4, 170.6, 191.8, 213.2, 238.8, 268.6, 302.8, 341.2, 383.8, 426.4, 537.4],
+                "pn16":   [20.4, 26.0, 32.6, 40.8, 51.4, 61.4, 73.6, 90.0, 130.8, 163.6, 184.0, 204.6, 229.2, 257.8, 290.6, 327.4, 368.2, 409.2, 515.6],
+                "pn20":   [19.4, 24.8, 31.0, 38.8, 48.8, 58.2, 69.8, 85.4, 124.2, 155.2, 174.6, 194.2, 217.4, 244.6, 275.6, 310.6, 349.4, 388.4, 489.4]
+            }
+        },
+        pvc: {
+            ep: 3.5e9,
+            dns: [21, 27, 34, 42, 48, 60, 75, 90, 110, 125, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450],
+            pns: {
+                "pn6":    [null, null, null, null, null, 57.0, 71.2, 85.6, 104.6, 118.8, 133.0, 152.2, 171.2, 190.2, 214.0, 237.6, 266.2, 299.6, 337.6, 380.4, 428.0],
+                "pn8":    [null, null, null, null, null, 56.4, 70.4, 84.4, 103.2, 117.2, 131.4, 150.2, 169.0, 187.6, 211.2, 234.6, 262.8, 295.6, 333.2, 375.4, 422.4],
+                "pn10":   [18.6, 24.4, 31.0, 38.6, 44.2, 55.4, 69.2, 83.0, 101.6, 115.4, 129.2, 147.6, 166.2, 184.6, 207.8, 230.8, 258.6, 290.8, 327.8, 369.4, 415.6],
+                "pn12.5": [18.2, 23.8, 30.6, 38.0, 43.4, 54.2, 67.8, 81.4, 99.4, 113.0, 126.6, 144.6, 162.8, 180.8, 203.4, 226.2, 253.2, 285.0, 321.2, 361.8, 407.0],
+                "pn16":   [17.8, 23.4, 30.0, 37.0, 42.4, 52.8, 66.0, 79.2, 96.8, 110.2, 123.4, 141.0, 158.6, 176.2, 198.2, 220.4, 246.8, 277.6, 312.8, 352.6, 396.6]
+            }
+        },
+        ductile: {
+            ep: 170e9,
+            dns: [80, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1200],
+            pns: {
+                "pn10": [78.6, 100.6, 152.6, 204.6, 256.0, 307.4, 407.0, 508.4, 610.0, 711.4, 812.0, 912.4, 1015.0, 1218.0],
+                "pn16": [78.4, 100.4, 151.8, 203.0, 254.0, 305.0, 404.0, 505.0, 606.0, 707.0, 807.0, 907.0, 1009.0, 1211.4],
+                "k9":   [76.0, 98.0, 150.0, 201.4, 252.4, 303.6, 402.8, 504.0, 605.2, 706.4, 806.6, 906.8, 1009.0, 1211.4]
+            }
+        },
+        steel: {
+            ep: 200e9,
+            dns: [50, 80, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200],
+            pns: {
+                "std":   [52.48, 77.92, 102.26, 154.08, 202.74, 254.46, 304.76, 387.36, 488.96, 590.94, 692.14, 793.74, 895.34, 996.94, 1098.54, 1200.14],
+                "sch40": [52.48, 77.92, 102.26, 154.08, 202.74, 254.46, 304.76, 387.36, 488.96, 575.04, 676.24, 777.84, 876.30, 977.90, 1079.50, 1181.10]
+            }
+        }
+    };
 
-function calculateHammer() {
-    const g = 9.81;
-    const mode = document.getElementById('calcMode').value;
-    const L = parseFloat(document.getElementById('L').value);
-    const v0 = parseFloat(document.getElementById('v0').value);
-    const Ts = parseFloat(document.getElementById('Ts').value);
-    const H0 = parseFloat(document.getElementById('H0').value);
-    const PN = parseFloat(document.getElementById('PN').value);
-    const sf = parseFloat(document.getElementById('safetyFactor').value);
-    
-    let a = 1000;
-    const mat = document.getElementById('mat').value;
+    let currentDi = 0;
+    let currentThickness = 0;
+    let currentEp = 1.0e9;
+    let currentPNVal = 10;
 
-    if (mat === 'custom') {
-        a = parseFloat(document.getElementById('customA').value) || 1000;
-    } else {
-        const dieRatio = parseFloat(document.getElementById('dieRatio').value) || 15;
-        let Ep = 170e9; // N/m2
-        if (mat === 'hdpe') Ep = 1.0e9;
-        if (mat === 'pvc') Ep = 3.5e9;
-        if (mat === 'ductile') Ep = 170e9;
-        if (mat === 'steel') Ep = 200e9;
-
-        const Ew = 2.19e9;
-        a = 1435 / Math.sqrt(1 + (Ew / Ep) * dieRatio);
+    function getNumericDN(dnVal) {
+        if (typeof dnVal === 'number') return dnVal;
+        let match = dnVal.match(/\d+/);
+        return match ? parseFloat(match[0]) : 0;
     }
 
-    const Tc = (2 * L) / a;
+    function onMaterialChange() {
+        const selectedVal = document.getElementById('materialSelect').value;
+        const [matGroup, pnSub] = selectedVal.split('_');
+        
+        const matData = PIPE_DB[matGroup];
+        currentEp = matData.ep;
 
-    let deltaH = 0;
-    let truongHopStr = "";
-    let congThucStr = "";
+        // Trích xuất PN thực tế làm mốc so sánh
+        if (pnSub.includes('pn')) {
+            currentPNVal = parseFloat(pnSub.replace('pn', ''));
+        } else if (pnSub === 'k9') {
+            currentPNVal = 25;
+        } else {
+            currentPNVal = 16; // Thép mặc định
+        }
 
-    let useCase1 = (mode === "auto") ? (Ts <= Tc) : (mode === "1");
+        const dnSelect = document.getElementById('dnSelect');
+        dnSelect.innerHTML = '';
 
-    if (useCase1) {
-        truongHopStr = `Đóng nhanh / Đột ngột (T_s = ${Ts}s ≤ T_c = ${Tc.toFixed(2)}s)`;
-        congThucStr = "Joukowsky: ΔH = (a × v₀) / g";
-        deltaH = (a * v0) / g;
-    } else {
-        truongHopStr = `Đóng từ từ (T_s = ${Ts}s > T_c = ${Tc.toFixed(2)}s)`;
-        congThucStr = "Michaud: ΔH = (2 × L × v₀) / (g × T_s)";
-        deltaH = (2 * L * v0) / (g * Ts);
+        const idList = matData.pns[pnSub];
+        let defaultIndex = -1;
+
+        matData.dns.forEach((dn, idx) => {
+            if (idList[idx] !== undefined && idList[idx] !== null && idList[idx] !== "-") {
+                let opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = typeof dn === 'number' ? `DN${dn}` : dn;
+                
+                let numericDN = getNumericDN(dn);
+                if (numericDN === 110) {
+                    opt.selected = true;
+                    defaultIndex = idx;
+                }
+                dnSelect.appendChild(opt);
+            }
+        });
+
+        if (defaultIndex === -1 && dnSelect.options.length > 0) {
+            dnSelect.selectedIndex = 0;
+        }
+
+        onDNChange();
     }
 
-    const Hmax = H0 + deltaH;
-    const Pmax_bar = Hmax / 10;
-    const choPhep = PN * sf;
+    function onDNChange() {
+        const selectedVal = document.getElementById('materialSelect').value;
+        const [matGroup, pnSub] = selectedVal.split('_');
+        const dnIndex = document.getElementById('dnSelect').value;
 
-    const statusClass = Pmax_bar <= choPhep ? "safe" : "warning";
-    const statusText = Pmax_bar <= choPhep 
-        ? `AN TOÀN (P_max ≤ ${choPhep.toFixed(1)} bar)` 
-        : `NGUY HIỂM (P_max vượt ngưỡng chịu đựng ${choPhep.toFixed(1)} bar)`;
+        if (dnIndex !== null && dnIndex !== "") {
+            const rawDN = PIPE_DB[matGroup].dns[dnIndex];
+            const numericDN = getNumericDN(rawDN);
+            const idVal = PIPE_DB[matGroup].pns[pnSub][dnIndex];
+            
+            currentDi = parseFloat(idVal) || 0;
+            // Tính độ dày e = (DN - Di)/2
+            currentThickness = (numericDN > currentDi) ? (numericDN - currentDi) / 2 : 5.0;
 
-    const resDiv = document.getElementById('result');
-    resDiv.style.display = 'block';
-    resDiv.innerHTML = `
-        <div class="result-item"><span>Vận tốc truyền sóng áp lực (a):</span> <strong>${a.toFixed(1)} m/s</strong></div>
-        <div class="result-item"><span>Thời gian sóng phản hồi (T_c = 2L/a):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
-        <div class="result-item"><span>Điều kiện áp dụng:</span> <strong>${truongHopStr}</strong></div>
-        <div class="result-item"><span>Công thức:</span> <strong>${congThucStr}</strong></div>
-        <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">
-        <div class="result-item"><span>Độ tăng áp va (ΔH):</span> <strong>+${deltaH.toFixed(2)} mH₂O (${(deltaH/10).toFixed(2)} bar)</strong></div>
-        <div class="result-item"><span>Áp lực đỉnh (H_max = H₀ + ΔH):</span> <strong>${Hmax.toFixed(2)} mH₂O (${Pmax_bar.toFixed(2)} bar)</strong></div>
-        <div class="result-item" style="margin-top:8px;"><span>Đánh giá an toàn:</span> <span class="${statusClass}">${statusText}</span></div>
-    `;
-}
+            document.getElementById('pipeDetailDisplay').innerText = `ID: ${currentDi} mm | Thickness (e): ${currentThickness.toFixed(2)} mm`;
+        } else {
+            currentDi = 0;
+            currentThickness = 0;
+            document.getElementById('pipeDetailDisplay').innerText = `ID: - mm | e: - mm`;
+        }
+
+        calculateHammer();
+    }
+
+    function calculateHammer() {
+        const g = 9.81;
+        const Ew = 2.19e9; // Mô đun đàn hồi thể tích nước (Pa)
+        
+        const mode = document.getElementById('calcMode').value;
+        const L = parseFloat(document.getElementById('L').value) || 0;
+        const v0 = parseFloat(document.getElementById('v0').value) || 0;
+        const Ts = parseFloat(document.getElementById('Ts').value) || 0;
+        const H0 = parseFloat(document.getElementById('H0').value) || 0;
+        const sf = parseFloat(document.getElementById('safetyFactor').value);
+
+        if (currentDi <= 0 || currentThickness <= 0 || L <= 0 || v0 <= 0) {
+            document.getElementById('result').style.display = 'none';
+            return;
+        }
+
+        // 1. Tự động tính vận tốc sóng âm a (m/s)
+        const diERatio = currentDi / currentThickness;
+        const a = 1435 / Math.sqrt(1 + (Ew / currentEp) * diERatio);
+
+        // 2. Tính chu kỳ sóng T_c
+        const Tc = (2 * L) / a;
+
+        let deltaH = 0;
+        let truongHopStr = "";
+        let congThucStr = "";
+
+        let useCase1 = (mode === "auto") ? (Ts <= Tc) : (mode === "1");
+
+        if (useCase1) {
+            truongHopStr = `Đóng nhanh / Đột ngột (T_s = ${Ts}s ≤ T_c = ${Tc.toFixed(2)}s)`;
+            congThucStr = "Joukowsky: ΔH = (a × v₀) / g";
+            deltaH = (a * v0) / g;
+        } else {
+            truongHopStr = `Đóng từ từ (T_s = ${Ts}s > T_c = ${Tc.toFixed(2)}s)`;
+            congThucStr = "Michaud: ΔH = (2 × L × v₀) / (g × T_s)";
+            deltaH = (2 * L * v0) / (g * Ts);
+        }
+
+        const Hmax = H0 + deltaH;
+        const Pmax_bar = Hmax / 10;
+        const choPhep_bar = currentPNVal * sf;
+
+        const statusClass = Pmax_bar <= choPhep_bar ? "safe" : "warning";
+        const statusText = Pmax_bar <= choPhep_bar 
+            ? `AN TOÀN (P_max ≤ Giới hạn cho phép ${choPhep_bar.toFixed(1)} bar)` 
+            : `NGUY HIỂM (P_max vượt quá giới hạn chịu đựng ${choPhep_bar.toFixed(1)} bar)`;
+
+        const resDiv = document.getElementById('result');
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = `
+            <div class="result-item"><span>Tỷ lệ D_i / e:</span> <strong>${diERatio.toFixed(2)}</strong></div>
+            <div class="result-item"><span>Vận tốc truyền sóng áp lực (a):</span> <strong>${a.toFixed(1)} m/s</strong></div>
+            <div class="result-item"><span>Thời gian sóng phản hồi (T_c = 2L/a):</span> <strong>${Tc.toFixed(2)} giây</strong></div>
+            <div class="result-item"><span>Kịch bản áp dụng:</span> <strong>${truongHopStr}</strong></div>
+            <div class="result-item"><span>Công thức:</span> <strong>${congThucStr}</strong></div>
+            <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">
+            <div class="result-item"><span>Độ tăng áp nước va (ΔH):</span> <strong>+${deltaH.toFixed(2)} mH₂O (${(deltaH/10).toFixed(2)} bar)</strong></div>
+            <div class="result-item"><span>Áp lực đỉnh (H_max = H₀ + ΔH):</span> <strong>${Hmax.toFixed(2)} mH₂O (${Pmax_bar.toFixed(2)} bar)</strong></div>
+            <div class="result-item" style="margin-top:6px;"><span>Đánh giá an toàn (PN${currentPNVal}):</span> <span class="${statusClass}">${statusText}</span></div>
+        `;
+    }
+
+    window.onload = function() {
+        onMaterialChange();
+    };
 </script>
 
 </body>
